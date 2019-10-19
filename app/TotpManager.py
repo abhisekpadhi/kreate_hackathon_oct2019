@@ -7,4 +7,4 @@ class OTPManager:
         self.totp =
 
     def get_now(self):
-        return
+        return None
