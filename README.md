@@ -7,7 +7,3 @@ by using barcode or OTP or self validating TOTP mechanisms.
 
 - Consider offline (no-connectivity) scenario as well.
 
-
-# Constraints
-- Either of the party might not have a smartphone, 
-therefore QR code won't work
