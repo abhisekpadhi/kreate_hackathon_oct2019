@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load staticfiles %}
+
+<main class="container">
+    <table class="responsive-table striped">
+        <thead>
+        <tr>
+            <th>Payable</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr>
+            <td> {{ payable }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <form method="post" action="{{ request.path }}" class="center">
+        <input type="hidden" name="action" value="start_verification">
+        <input type="hidden" name="payable" value="{{ payable }}">
+        <button class="btn-large blue" type="submit">
+            Start Verification
+        </button>
+    </form>
+
+</main>
+
+{% endblock %}

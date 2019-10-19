@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load staticfiles %}
+
+<main class="container">
+    <table class="responsive-table striped">
+        <thead>
+        <tr>
+            <th>Order Id</th>
+            <th>Total</th>
+            <th>Buyer Phone</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr>
+            <td> {{ order.id }}</td>
+            <td> {{ order.total }}</td>
+            <td> {{ order.user.phone }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <form method="post" action="{{ request.path }}" class="center">
+        <input type="hidden" name="action" value="start_transaction">
+
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="payable" name="payable" value="{{ payable }}" type="text" class="validate">
+                <label for="payable">Payable</label>
+            </div>
+        </div>
+
+        <button class="btn-large blue" type="submit">
+            Collect
+        </button>
+    </form>
+
+</main>
+
+{% endblock %}

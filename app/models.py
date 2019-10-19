@@ -9,8 +9,10 @@ phone_regex = RegexValidator(
 
 
 class User(models.Model):
-    phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True, null=True)
+    phone = models.CharField(validators=[phone_regex], max_length=17, blank=True, null=True)
     is_collector = models.BooleanField(default=False)
+    privkey = models.TextField(default="")
+    pubkey = models.TextField(default="")
 
 
 class Order(models.Model):
@@ -19,10 +21,15 @@ class Order(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
 
 
+class OrderPickup(models.Model):
+    collector = models.ForeignKey('User', on_delete=models.CASCADE)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_failed = models.BooleanField(default=False)
+
+
 class Transaction(models.Model):
-    order_id = models.ForeignKey('Order', on_delete=models.CASCADE)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE)
     paid_by = models.BigIntegerField(null=True)
     paid_to = models.BigIntegerField(null=True)
     amt = models.BigIntegerField(null=False, default=0)
-
-

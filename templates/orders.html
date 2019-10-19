@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load staticfiles %}
+
+<main class="container">
+
+    {% for pickup in pickups %}
+
+    <a href="{% url 'order' pickup.order.id %}" class="hoverable">
+        <div class="card">
+            <div class="card-content">
+                <div class="row">
+                    <div class="col s6 left">
+                        Order ID: {{ pickup.order.id }}
+                    </div>
+                    <div class="col s6 right">
+                        Order Total: {{ pickup.order.total }}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </a>
+
+    {% endfor %}
+
+</main>
+
+{% endblock %}

@@ -44,7 +44,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -135,3 +135,11 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+'''MSG91'''
+MSG91_API_URL = "https://api.msg91.com/api/v2/sendsms?response=json"
+MSG91_AUTH_KEY = "255330ABHWwEVa3X75c32ce0c"
+MSG91_SENDER_ID = "OCCOTP"
+MSG91_ROUTE = "4"
+MSG91_COUNTRY = "91"
