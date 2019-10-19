@@ -5,6 +5,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from base64 import b64encode, b64decode
 from app.UserManager import UserManager
+from OfflineCashCollector import settings
 import random
 
 
@@ -12,41 +13,46 @@ class EncryptionManager:
     def __init__(self):
         self.public_exponent = 65537
         self.key_size = 512
-        self.backend = default_backend()
         self.user_manager = UserManager()
-        self.algorithm = hashes.SHA1()
         self.otp_length = 4
 
     def generate_key_pair_for_user(self, user_id):
         private_key = rsa.generate_private_key(
             public_exponent=self.public_exponent,
             key_size=self.key_size,
-            backend=self.backend
+            backend=default_backend()
         )
         public_key = private_key.public_key()
 
         user = self.user_manager.get_user_by_id(user_id=user_id)
-
+        print(type(user))
         if user:
-            user.update(
-                privkey=private_key.private_bytes(
-                    encoding=serialization.Encoding.PEM,
-                    format=serialization.PrivateFormat.TraditionalOpenSSL,
-                    encryption_algorithm=serialization.NoEncryption()
-                ).decode(),
-                pubkey=public_key.public_bytes(
-                    encoding=serialization.Encoding.PEM,
-                    format=serialization.PublicFormat.SubjectPublicKeyInfo
-                ).decode()
-            )
+            user.privkey = private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption()
+            ).decode()
+
+            user.pubkey = public_key.public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.SubjectPublicKeyInfo
+            ).decode()
+
+            user.save()
 
     def get_private_key_by_user_id(self, user_id):
-        user = self.user_manager.get_user_by_id(user_id=user_id)
-        private_key = serialization.load_pem_private_key(
-            user.privkey,
-            password=None,
-            backend=self.backend
-        )
+        # user = self.user_manager.get_user_by_id(user_id=user_id)
+        # if not user.privkey:
+        #     self.generate_key_pair_for_user(user_id=user.id)
+        #     user = self.user_manager.get_user_by_id(user_id=user_id)
+
+        with open(settings.PRIVKEY, "rb") as key_file:
+            private_key = serialization.load_pem_private_key(
+                key_file.read(),
+                password=None,
+                backend=default_backend()
+            )
+        
         return private_key
 
     def get_public_key_by_user_id(self, user_id):
@@ -58,8 +64,8 @@ class EncryptionManager:
         ciphertext = public_key.encrypt(
             data.encode(),
             padding.OAEP(
-                mgf=padding.MGF1(algorithm=self.algorithm),
-                algorithm=self.algorithm,
+                mgf=padding.MGF1(algorithm=hashes.SHA1()),
+                algorithm=hashes.SHA1(),
                 label=None
             )
         )
@@ -88,31 +94,35 @@ class EncryptionManager:
         signature = private_key.sign(
             data.encode(),
             padding.PSS(
-                mgf=padding.MGF1(self.algorithm),
+                mgf=padding.MGF1(hashes.SHA1()),
                 salt_length=padding.PSS.MAX_LENGTH
             ),
-            self.algorithm
+            hashes.SHA1()
         )
         return signature
 
-    @staticmethod
     def get_encoded_signature(self, signature):
         return b64encode(signature)
 
+    def get_decoded_signature(self, signature):
+        return b64decode(signature)
+
     def is_data_verified(self, data, signature, user_id):
         public_key = self.get_public_key_by_user_id(user_id)
+        print(type(signature))
         try:
             public_key.verify(
                 signature,
                 data.encode(),
                 padding.PSS(
-                    mgf=padding.MGF1(self.algorithm),
+                    mgf=padding.MGF1(hashes.SHA1()),
                     salt_length=padding.PSS.MAX_LENGTH
                 ),
-                self.algorithm
+                hashes.SHA1()
             )
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
 

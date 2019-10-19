@@ -6,24 +6,39 @@
     <table class="responsive-table striped">
         <thead>
         <tr>
+            <th>Order ID</th>
             <th>Payable</th>
+            <th>Collector ID</th>
+            <th>Cipher</th>
+            <th>Signature</th>
         </tr>
         </thead>
 
         <tbody>
         <tr>
+            <td> {{ order_id }}</td>
             <td> {{ payable }}</td>
+            <td> {{ user_id }}</td>
+            <td> {{ cipher }}</td>
+            <td> {{ signature }}</td>
         </tr>
         </tbody>
     </table>
 
     <form method="post" action="{{ request.path }}" class="center">
-        <input type="hidden" name="action" value="start_verification">
+        <input type="hidden" name="action" value="start_otp_validation">
         <input type="hidden" name="payable" value="{{ payable }}">
         <input type="hidden" name="order_id" value="{{ order_id }}">
         <input type="hidden" name="user_id" value="{{ user_id }}">
+        <input type="hidden" name="signature" value="{{ signature }}">
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="otp" name="otp" type="text" class="validate">
+                <label for="otp">OTP</label>
+            </div>
+        </div>
         <button class="btn-large blue" type="submit">
-            Start Verification
+            Validate OTP
         </button>
     </form>
 

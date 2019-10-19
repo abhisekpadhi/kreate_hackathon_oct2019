@@ -143,3 +143,6 @@ MSG91_AUTH_KEY = "255330ABHWwEVa3X75c32ce0c"
 MSG91_SENDER_ID = "OCCOTP"
 MSG91_ROUTE = "4"
 MSG91_COUNTRY = "91"
+
+'''KEYS'''
+PRIVKEY = "/Users/abhisekpadhi/IdeaProjects/OfflineCashCollector/keys/privkey.pem"

@@ -33,3 +33,5 @@ class Transaction(models.Model):
     paid_by = models.BigIntegerField(null=True)
     paid_to = models.BigIntegerField(null=True)
     amt = models.BigIntegerField(null=False, default=0)
+    is_done = models.BooleanField(default=False)
+

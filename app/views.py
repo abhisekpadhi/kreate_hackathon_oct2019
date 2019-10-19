@@ -14,6 +14,10 @@ import datetime
 import json
 from app.LoginManager import LoginManager
 from app.OrderManager import OrderManager
+from app.EncryptionManager import EncryptionManager
+from app.OTPManager import OTPManager
+from app.UserManager import UserManager
+from base64 import b64decode, b64encode
 
 
 class HomePageView(View):
@@ -38,6 +42,9 @@ class OrdersView(View):
     def __init__(self):
         super().__init__()
         self.order_manager = OrderManager()
+        self.encryption_manager = EncryptionManager()
+        self.otp_manager = OTPManager()
+        self.user_manager = UserManager()
 
     def get(self, request, order_id=None):
         login_id = request.session.get('login_id', None)
@@ -76,9 +83,87 @@ class OrdersView(View):
                 if not payable:
                     return redirect(reverse('orders'))
                 context = {
-                    "payable": int(payable)
+                    "payable": int(payable),
+                    "order_id": order_id,
+                    "user_id": login_id
                 }
                 return render(request, "transact.html", context)
 
             if request.POST.get('action') == 'start_verification':
-                pass
+                order_id = request.POST.get('order_id')
+                payable = request.POST.get('payable')
+                user_id = request.POST.get('user_id')
+
+                if order_id and payable and user_id:
+                    data = f"{order_id}.{payable}.{user_id}"
+
+                    print(data)
+
+                    ciphertext = self.encryption_manager.get_encrypted_cipher(
+                        user_id=int(user_id),
+                        data=data
+                    )
+
+                    plaintext = self.encryption_manager.get_decrypt_cipher(
+                        user_id=user_id,
+                        ciphertext=ciphertext
+                    )
+
+                    otp = self.encryption_manager.get_otp_string()
+
+                    data = f"{plaintext.decode()}.{otp}"
+
+                    signature = self.encryption_manager.get_signature(
+                        data=data,
+                        user_id=user_id
+                    )
+                    print(f'generated: {signature}')
+
+                    otp_message = f"Your OTP is - {otp}"
+                    # self.otp_manager.send_otp(
+                    #     data=otp_message,
+                    #     to=[self.user_manager.get_user_by_id(user_id).phone]
+                    # )
+                    print(f'otp_message: {otp_message}')
+
+                    context = {
+                        "order_id": order_id,
+                        "payable": payable,
+                        "user_id": user_id,
+                        "cipher": b64encode(ciphertext).decode(),
+                        "signature": b64encode(signature).decode()
+                    }
+                    return render(request, "verify.html", context)
+                else:
+                    return redirect(reverse('orders'))
+
+            if request.POST.get('action') == 'start_otp_validation':
+                otp = request.POST.get('otp')
+                order_id = request.POST.get('order_id')
+                payable = request.POST.get('payable')
+                user_id = request.POST.get('user_id')
+                signature = request.POST.get('signature')
+                print(f'Received: {b64decode(signature)}')
+
+                data = f"{order_id}.{payable}.{user_id}.{otp}"
+
+
+                # signature = self.encryption_manager.get_signature(
+                #     data=data,
+                #     user_id=user_id
+                # )
+
+                is_verified = self.encryption_manager.is_data_verified(
+                    data=data,
+                    signature=b64decode(signature),
+                    user_id=user_id
+                )
+
+                if is_verified:
+                    return render(request, "success.html")
+
+                else:
+                    return redirect(reverse('orders'))
+
+
+

@@ -21,7 +21,7 @@ class OTPManager:
             if sms_client.response.status_code != 200:
                 raise Exception
             else:
-                print(sms_client.response.status_code)
+                print(f'SMS Send Status: {sms_client.response.status_code}')
         except:
             print("Failed to send sms.")
 
