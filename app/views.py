@@ -3,15 +3,6 @@ from __future__ import unicode_literals
 from django.views import View
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
-from django.forms import model_to_dict
-from django.views.generic.base import TemplateView
-from .models import *
-from urllib.parse import urlencode, quote_plus
-from pprint import pprint
-import datetime
-import json
 from app.LoginManager import LoginManager
 from app.OrderManager import OrderManager
 from app.EncryptionManager import EncryptionManager
@@ -119,11 +110,11 @@ class OrdersView(View):
                     )
                     print(f'generated: {signature}')
 
-                    otp_message = f"Your OTP is - {otp}"
-                    # self.otp_manager.send_otp(
-                    #     data=otp_message,
-                    #     to=[self.user_manager.get_user_by_id(user_id).phone]
-                    # )
+                    otp_message = f"Your OTP is - {otp}. Payable amount is Rs.{payable}"
+                    self.otp_manager.send_otp(
+                        data=otp_message,
+                        to=[self.user_manager.get_user_by_id(user_id).phone]
+                    )
                     print(f'otp_message: {otp_message}')
 
                     context = {
@@ -146,12 +137,6 @@ class OrdersView(View):
                 print(f'Received: {b64decode(signature)}')
 
                 data = f"{order_id}.{payable}.{user_id}.{otp}"
-
-
-                # signature = self.encryption_manager.get_signature(
-                #     data=data,
-                #     user_id=user_id
-                # )
 
                 is_verified = self.encryption_manager.is_data_verified(
                     data=data,
