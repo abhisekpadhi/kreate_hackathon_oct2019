@@ -9,5 +9,4 @@ by using barcode or OTP or self validating TOTP mechanisms.
 
 
 # PPT
-https://docs.google.com/presentation/d/e/2PACX-1vTJB2mGl0kYWu8GcjwvuGHwPFVORqN9Y5T2xg-1ZWkSGQxTFul74f74CSRpc2fqJHy5tlOk5dha6ksj/pub?start=false&loop=false&delayms=3000`
-
+https://tinyurl.com/y3ousslv
